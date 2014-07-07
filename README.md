@@ -3,6 +3,10 @@ compracoletiva
 
 Versão customizada do redeecologica/pedidos para uso da Compra Coletiva da Cooperativa Equilibrium
 
+*Não subi o setting.php por incompetência no uso do git. Queria manter uma versão de exemplo, aqui 
+no git-hub, mas quando fiz o force e passou a monitorar o arquivo e eu não pude mais atualizar o meu
+com as passwords etc... No commit 5e2696a2dfa73e1d744dee9729c0704b5cf1609f tem o arquivo de exemplo.
+
 Algumas alterações que foram necessárias para o nosso ambiente:
 
 1 - Arquivos que tiveram a funçao de data alterada para funcionar no servidor Godaddy, com 4 horas a
