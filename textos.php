@@ -13,7 +13,7 @@
   </div>
   
   <div class="panel-body">
-     Atualização de textos que são utilizados internamente pelo sistema.
+     Atualização de textos que são utilizados internamente pelo sistema. 
   </div>
   
            
