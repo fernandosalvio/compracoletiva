@@ -64,7 +64,8 @@
 			  		if($_SESSION[PAP_ADM] || $_SESSION[PAP_RESP_PEDIDO]  )			  
 					{
 			   ?>
-                    <li><a href="produtores.php"><i class="glyphicon glyphicon-picture"></i> Produtores</a></li>                
+                    <li><a href="produtores.php"><i class="glyphicon glyphicon-picture"></i> Produtores</a></li> 
+                    <li><a href="categorias.php"><i class="glyphicon glyphicon-map-marker"></i> Categorias</a></li>                
                     <li><a href="produtos.php"><i class="glyphicon glyphicon-leaf"></i> Produtos</a></li>
 	               	<li class="divider"></li>                    
 

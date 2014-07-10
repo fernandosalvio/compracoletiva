@@ -15,6 +15,7 @@
 			$prod_nome = "";
 			$prod_prodt = "";
 			$prod_forn = "";
+			$prod_cate = "";
 			$prod_unidade = "";
 			$prod_valor_compra = "";
 			$prod_valor_venda = "";
@@ -45,12 +46,13 @@
 					$res = executa_sql($sql);
 			}
 
-			$sql = "INSERT INTO produtos (prod_id, prod_ini_validade, prod_fim_validade, prod_nome, prod_prodt, prod_forn, ";
+			$sql = "INSERT INTO produtos (prod_id, prod_ini_validade, prod_fim_validade, prod_nome, prod_prodt, prod_forn, prod_cate, ";
 			$sql.= "prod_unidade, prod_valor_compra, prod_valor_venda, prod_valor_venda_margem, prod_multiplo_venda, prod_descricao) ";
 			$sql.= " VALUES (". prep_para_bd($prod_id) . ", DATE_ADD(NOW(),INTERVAL 4 HOUR), '9999-12-31', ";
 			$sql.= prep_para_bd($_REQUEST["prod_nome"]) . ", ";
 			$sql.= prep_para_bd($_REQUEST["prod_prodt"]) . ", ";
 			$sql.= prep_para_bd($_REQUEST["prod_forn"]) . ", ";
+			$sql.= prep_para_bd($_REQUEST["prod_cate"]) . ", ";
 			$sql.= prep_para_bd($_REQUEST["prod_unidade"]) . ", ";
 			$sql.= prep_para_bd(formata_numero_para_mysql($_REQUEST["prod_valor_compra"])) . ", ";
 			$sql.= prep_para_bd(formata_numero_para_mysql($_REQUEST["prod_valor_venda"])) . ", ";
@@ -75,8 +77,9 @@
 		
 		if ($action == ACAO_EXIBIR_LEITURA || $action == ACAO_EXIBIR_EDICAO)  // exibir para visualização, ou exibir para edição
 		{
-		  $sql = "SELECT prod_auto_inc, prod_nome, prod_prodt, prod_forn, prod_unidade, FORMAT(prod_valor_compra,2) prod_valor_compra,  FORMAT(prod_valor_venda,2) prod_valor_venda,  FORMAT(prod_valor_venda_margem,2) prod_valor_venda_margem, FORMAT(prod_multiplo_venda,2) prod_multiplo_venda, prod_descricao, forn_nome_curto, prodt_nome FROM produtos ";
+		  $sql = "SELECT prod_auto_inc, prod_nome, prod_prodt, prod_forn, prod_cate, prod_unidade, FORMAT(prod_valor_compra,2) prod_valor_compra,  FORMAT(prod_valor_venda,2) prod_valor_venda,  FORMAT(prod_valor_venda_margem,2) prod_valor_venda_margem, FORMAT(prod_multiplo_venda,2) prod_multiplo_venda, prod_descricao, forn_nome_curto, prodt_nome, cate_nome FROM produtos ";
 		  $sql.= "LEFT JOIN fornecedores ON prod_forn = forn_id  ";
+		  $sql.= "LEFT JOIN categorias ON prod_cate = cate_id  ";
 		  $sql.= "LEFT JOIN produtotipos ON prod_prodt = prodt_id  ";
 		  $sql.= "WHERE prod_ini_validade <= DATE_ADD(NOW(),INTERVAL 4 HOUR) AND prod_fim_validade >= DATE_ADD(NOW(),INTERVAL 4 HOUR) ";
 		  $sql.= "AND prod_id=". prep_para_bd($prod_id);
@@ -89,6 +92,7 @@
 			$prod_nome = $row["prod_nome"];
 			$prod_prodt = $row["prod_prodt"];
 			$prod_forn = $row["prod_forn"];
+			$prod_cate = $row["prod_cate"];
 			$prod_unidade = $row["prod_unidade"];
 			$prod_valor_compra = formata_moeda($row["prod_valor_compra"]);
 			$prod_valor_venda = formata_moeda($row["prod_valor_venda"]);
@@ -96,6 +100,7 @@
 			$prod_multiplo_venda = formata_moeda($row["prod_multiplo_venda"]);
 			$prod_descricao =  $row["prod_descricao"];
 			$forn_nome_curto = $row["forn_nome_curto"];
+			$cate_nome = $row["cate_nome"];
 			$prodt_nome = $row["prodt_nome"];
 
 		   }
@@ -120,7 +125,10 @@
 			</tr>
             <tr>
 				<th>Produtor:</th> <td><?php echo($forn_nome_curto); ?></td>
-			</tr>        
+			</tr>
+			<tr>
+				<th>Categoria:</th> <td><?php echo($cate_nome); ?></td>
+			</tr>         
     		<tr>
 				<th>Nome:</th> <td><?php echo($prod_nome); ?></td>
 			</tr>	    
@@ -242,7 +250,30 @@
             	</div>  
 
        
-                 
+                 <div class="form-group">
+                   <label class="control-label col-sm-2" for="prod_prodt">Categoria</label>
+                   <div class="col-sm-2">                
+                     <select name="prod_cate" id="prod_cate" class="form-control">
+                       	<option value="-1">SELECIONAR</option>
+						<?php
+                            
+                            $sql = "SELECT cate_id, cate_nome ";
+                            $sql.= "FROM categorias ";
+                            $sql.= "ORDER BY cate_nome ";
+                            $res = executa_sql($sql);
+                            if($res)
+                            {
+                              while ($row = mysqli_fetch_array($res,MYSQLI_ASSOC)) 
+                              {
+                                 echo("<option value='" . $row['cate_id'] . "'");
+                                 if($row['cate_id']==$prod_cate) echo(" selected");
+                                 echo (">" . $row['cate_nome'] . "</option>");
+                              }
+                            }
+                        ?>            
+                     </select>                       
+                   </div>
+                 </div>                 
 
 
             <div class="form-group">

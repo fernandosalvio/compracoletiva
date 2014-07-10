@@ -19,6 +19,7 @@
 	<?php  
   		$prod_prodt = request_get("prod_prodt",-1) ;
 		$prod_forn = request_get("prod_forn",-1) ;
+    $prod_cate = request_get("prod_cate",-1) ;
 	?>
      <fieldset>     
      	<div class="form-group">
@@ -77,7 +78,29 @@
                 </select>                           
                     
          </div>                                  
-                    
+                   &nbsp;
+              <div class="form-group">
+          <label for="prod_prodt">Categoria: </label>            
+                 <select name="prod_cate" id="prod_cate" onchange="javascript:frm_filtro.submit();" class="form-control">
+                        <option value="-1" <?php echo(($prod_cate==-1)?" selected" : ""); ?> >TODOS</option>
+            <?php
+                            
+                            $sql = "SELECT cate_id, cate_nome ";
+                            $sql.= "FROM categorias ";
+                            $sql.= "ORDER BY cate_nome ";
+                            $res = executa_sql($sql);
+                            if($res)
+                            {
+                              while ($row = mysqli_fetch_array($res,MYSQLI_ASSOC)) 
+                              {
+                                 echo("<option value='" . $row['cate_id'] . "'");
+                                 if($row['cate_id']==$prod_cate) echo(" selected");
+                                 echo (">" . $row['cate_nome'] . "</option>");
+                              }
+                            }
+                        ?>  
+                 </select>    
+         </div>             
       </fieldset>
   </form>
  </div>
@@ -87,8 +110,9 @@
 			<tr>
 				<th>#</th>
 				<th>Tipo</th>                
-                <th>Produtor</th>                
-        		<th>Nome</th>
+        <th>Produtor</th>                
+        <th>Categoria</th>
+        <th>Nome</th>
 				<th>Unidade</th>
 				<th>Valor (R$)</th>
 				<th>Valor com Margem (R$)</th>
@@ -97,13 +121,15 @@
 		<tbody>
 				<?php
 					
-					$sql = "SELECT prod_id, prod_nome, prod_unidade,FORMAT(prod_valor_venda,2) prod_valor_venda, FORMAT(prod_valor_venda_margem,2) prod_valor_venda_margem, prod_forn, prod_prodt, prodt_nome, forn_nome_curto  ";
+					$sql = "SELECT prod_id, prod_nome, prod_unidade,FORMAT(prod_valor_venda,2) prod_valor_venda, FORMAT(prod_valor_venda_margem,2) prod_valor_venda_margem, prod_forn, prod_prodt, prodt_nome, forn_nome_curto, cate_nome  ";
 					$sql.= "FROM produtos LEFT JOIN fornecedores ON prod_forn = forn_id ";
-					$sql.= "LEFT JOIN produtotipos ON prod_prodt = prodt_id ";						
+					$sql.= "LEFT JOIN produtotipos ON prod_prodt = prodt_id ";
+          $sql.= "LEFT JOIN categorias ON prod_cate = cate_id ";						
 					$sql.= "WHERE prod_ini_validade <= DATE_ADD(NOW(),INTERVAL 4 HOUR) AND prod_fim_validade >= DATE_ADD(NOW(),INTERVAL 4 HOUR) ";
 					if($prod_prodt!=-1) $sql.= "  AND  prodt_id = " . prep_para_bd($prod_prodt) .  " ";
-					if($prod_forn!=-1) 	 $sql.= " AND forn_id = " . prep_para_bd($prod_forn) .  " ";						
-					$sql.= "ORDER BY prodt_nome, forn_nome_curto, prod_nome, prod_unidade ";
+					if($prod_forn!=-1) 	 $sql.= " AND forn_id = " . prep_para_bd($prod_forn) .  " ";
+          if($prod_cate!=-1)   $sql.= " AND cate_id = " . prep_para_bd($prod_cate) .  " ";  						
+					$sql.= "ORDER BY prodt_nome, forn_nome_curto, cate_nome, prod_nome, prod_unidade ";
 								
 					$res = executa_sql($sql);
 
@@ -116,7 +142,8 @@
 				  <tr>
                   	 <td><?php echo(++$contador);?></td>               
 					 <td><?php echo($row['prodt_nome']);?></td>  
-					 <td><?php echo($row['forn_nome_curto']);?></td>                                    
+					 <td><?php echo($row['forn_nome_curto']);?></td>
+           <td><?php echo($row['cate_nome']);?></td>                                     
 					 <td><a href="produto.php?action=0&amp;prod_id=<?php echo($row['prod_id']);?>"><?php echo($row['prod_nome']);?></a></td>
                      <td><?php echo($row['prod_unidade']);?></td> 
                      <td><?php echo(formata_moeda($row['prod_valor_venda']));?></td> 

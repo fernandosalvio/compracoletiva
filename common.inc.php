@@ -404,6 +404,7 @@ function get_chamada_anterior($cha_id)
 	$cha_id_bd = prep_para_bd($cha_id);
 	
 	$sql = "SELECT cha_id FROM chamadas WHERE cha_prodt in (SELECT cha_prodt from chamadas where cha_id=" . $cha_id_bd  . ") AND cha_dt_entrega < (SELECT cha_dt_entrega FROM chamadas WHERE cha_id=" . $cha_id_bd  . ") AND cha_id <> " . $cha_id_bd  . " ORDER BY cha_dt_entrega DESC limit 1" ;
+
 	if($row = mysqli_fetch_array(executa_sql($sql),MYSQLI_ASSOC))
 	{
 		$cha_id_anterior = $row["cha_id"];

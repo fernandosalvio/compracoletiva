@@ -200,7 +200,7 @@
           
 <?php
 
-		$sql = "SELECT prod_id, prod_nome, prod_descricao, FORMAT(prod_valor_venda,2) prod_valor_venda, forn_nome_curto, ";
+		$sql = "SELECT prod_id, prod_nome, prod_descricao,cate_nome, FORMAT(prod_valor_venda,2) prod_valor_venda, ";
 		$sql.= "FORMAT(pedprod_quantidade,1) pedprod_quantidade, chaprod_disponibilidade, ";
 		$sql.= "FORMAT (prod_valor_venda_margem,2) prod_valor_venda_margem, prod_unidade ";
 		$sql.= "FROM pedidoprodutos ";
@@ -208,19 +208,19 @@
 		$sql.= "LEFT JOIN pedidos ON pedprod_ped = ped_id AND ped_id = " . prep_para_bd($ped_id) . " ";		
 		$sql.= "LEFT JOIN chamadas ON ped_cha = cha_id ";
 		$sql.= "LEFT JOIN chamadaprodutos ON chaprod_cha = ped_cha AND chaprod_prod = prod_id ";
-		$sql.= "LEFT JOIN fornecedores ON prod_forn = forn_id ";
+        $sql.= "LEFT JOIN categorias ON prod_cate = cate_id ";
 		$sql.= "WHERE pedprod_quantidade > '0.0' ";
 		$sql.= "AND pedprod_ped = " . prep_para_bd($ped_id) . " ";
 		$sql.= "AND prod_ini_validade<=cha_dt_entrega AND prod_fim_validade>=cha_dt_entrega ";
 
-		$sql.= "ORDER BY forn_nome_curto, prod_nome, prod_unidade ";
+		$sql.= "ORDER BY cate_nome, prod_nome, prod_unidade ";
 		$res = executa_sql($sql);
 				
 		
 		
 		if($res)
 		{
-		   $ultimo_forn = "";
+		   $ultima_cate = "";
 		   $total_associado=0;
 		   $total_nao_associado=0;		   
 		   ?>		   
@@ -228,7 +228,7 @@
            <table class="table table-pedido table-striped table-bordered table-condensed">
 				<thead>
                 	<tr>
-							  <th>Produtor/Produto</th>
+							  <th>Categoria/Produto</th>
 							  <th>Unidade</th>
 							  <th>Preço para<br>Associado (R$)</th>
 							  <th>Preço para<br>Não-Associado (R$)</th>
@@ -241,13 +241,13 @@
 		   
 		   while ($row = mysqli_fetch_array($res,MYSQLI_ASSOC)) 
 		   {
-				if($row["forn_nome_curto"]!=$ultimo_forn)
+				if($row["cate_nome"]!=$ultimo_forn)
 				{					
-					$ultimo_forn = $row["forn_nome_curto"];					
+					$ultimo_forn = $row["cate_nome"];					
 					?>
 					 
 							<tr>
-							  <th colspan="6"><?php echo($row["forn_nome_curto"]);?></th>
+							  <th colspan="6"><?php echo($row["cate_nome"]);?></th>
     						</tr>
 			 
 					<?php					
@@ -371,34 +371,34 @@
 <?php
  
 		
-                    $sql = "SELECT prod_id, prod_nome, prod_descricao,FORMAT(prod_valor_venda,2) prod_valor_venda, forn_nome_curto, ";
-					$sql.= "forn_nome_completo, FORMAT(pedprod_quantidade,1) pedprod_quantidade, chaprod_disponibilidade, ";
+                    $sql = "SELECT prod_id, prod_nome, prod_descricao,cate_nome,FORMAT(prod_valor_venda,2) prod_valor_venda, ";
+					$sql.= "FORMAT(pedprod_quantidade,1) pedprod_quantidade, chaprod_disponibilidade, ";
 					$sql.= "FORMAT (prod_valor_venda_margem,2) prod_valor_venda_margem, prod_unidade, prod_multiplo_venda ";
 					$sql.= "FROM chamadaprodutos ";
 
                     $sql.= "LEFT JOIN produtos ON chaprod_prod = prod_id ";
                     $sql.= "LEFT JOIN chamadas ON chaprod_cha = cha_id ";
-                    $sql.= "LEFT JOIN fornecedores ON prod_forn = forn_id ";
                     $sql.= "LEFT JOIN pedidos ON cha_id = ped_cha AND ped_id = " . prep_para_bd($ped_id) . " ";
                     $sql.= "LEFT JOIN pedidoprodutos ON pedprod_prod = prod_id AND pedprod_ped = ped_id ";
-
+                    $sql.= "LEFT JOIN categorias ON prod_cate = cate_id ";
                     $sql.= "WHERE chaprod_disponibilidade <>'0' ";
 					$sql.= "AND chaprod_cha = " . prep_para_bd($ped_cha) . " ";
 					$sql.= "AND prod_ini_validade<=cha_dt_entrega AND prod_fim_validade>=cha_dt_entrega ";
 
-                    $sql.= "ORDER BY forn_nome_curto, prod_nome, prod_unidade ";
+                    $sql.= "ORDER BY cate_nome, prod_nome, prod_unidade ";
+
                     $res = executa_sql($sql);	
 														
                     if($res)
                     {
-					   $ultimo_forn = "";
+					   $ultima_cate = "";
 					   
 					   ?>
 					   
                        <table class="table table-pedido table-striped table-bordered table-condensed table-hover">
 						<thead>		 
                             <tr>
-                              <th>Produtor/Produto</th>
+                              <th>Categoria/Produto</th>
                               <th>Unidade</th>
                               <th>Preço para<br>Associado (R$)</th>
                               <th>Preço para<br>Não-Associado (R$)</th>
@@ -412,16 +412,16 @@
 					   $total_pedido=0;
                        while ($row = mysqli_fetch_array($res,MYSQLI_ASSOC)) 
                        {
-							if($row["forn_nome_curto"]!=$ultimo_forn)
+							if($row["cate_nome"]!=$ultima_cate)
 							{
 								
-								$ultimo_forn = $row["forn_nome_curto"];
+								$ultima_cate = $row["cate_nome"];
 								
 								?>
 								 
 										<tr>
 										  <th colspan="6">
-										  				<?php echo($row["forn_nome_completo"]);															
+										  				<?php echo($row["cate_nome"]);															
 										  				?>
                                             
                                               </th>
@@ -519,7 +519,39 @@
 
 	if($pedido_enviado)
  	{
-		$msg_confirmacao="Seu pedido de " . $prodt_nome . " foi confirmado!\n\n";
+
+ 		// Rotina para pegar o valor total do pedido.
+
+ 		$sql = "SELECT SUM(valor_venda_total) total_pedido from(";
+		$sql.= "select  ";
+		$sql.= "cha_id, cha_dt_entrega, prodt_nome, usr_nome_curto,ped_id,prod_nome,pedprod_quantidade, ";
+		$sql.= "prod_valor_compra * pedprod_quantidade AS prod_valor_compra_total, ";
+		$sql.= "case ped_usr_associado  ";
+		$sql.= "when 1 then prod_valor_venda * pedprod_quantidade ";
+		$sql.= "when 0 then prod_valor_venda_margem * pedprod_quantidade ";
+		$sql.= "END valor_venda_total, ";
+		$sql.= "ped_fechado,ped_dt_atualizacao  ";
+		$sql.= "from pedidos p  ";
+		$sql.= "inner join  pedidoprodutos pp on p.ped_id = pp.pedprod_ped ";
+		$sql.= "inner join usuarios u on p.ped_usr = u.usr_id ";
+		$sql.= "inner join produtos pro on pp.pedprod_prod = pro.prod_id ";
+		$sql.= "inner JOIN chamadas cha ON p.ped_cha = cha.cha_id  ";
+		$sql.= "inner join produtotipos pt on pt.prodt_id = cha.cha_prodt ";
+		$sql.= "where prod_ini_validade<=cha_dt_entrega AND prod_fim_validade>=cha_dt_entrega  ";
+		$sql.= "AND pedprod_quantidade > 0 ";
+		$sql.= "and ped_id =". $ped_id_bd .") a ";
+
+		$res = executa_sql($sql);	
+						
+		if($res)
+		{
+		  $row = mysqli_fetch_array($res,MYSQLI_ASSOC); 
+		  $total_pedido = $row["total_pedido"];
+		}
+
+		$msg_confirmacao="Seu pedido foi confirmado!\n\n";
+
+		$msg_confirmacao.="Valor total: R$ ". formata_moeda($total_pedido).".\n\n";
 		
 		$msg_confirmacao.="Para visualizar o seu pedido, acesse o sistema online:\n";
 		$msg_confirmacao.="" . URL_ABSOLUTA  . "\n\n";
@@ -538,8 +570,7 @@
 		}
 		$msg_confirmacao.=get_texto_interno("txt_email_final_confirmacao");
 		
-		
-		envia_email_cestante($ped_usr,"Confirmação do Pedido de " . $prodt_nome . " - " . $cha_dt_entrega,"",$msg_confirmacao);
+		envia_email_cestante($ped_usr,"Confirmação do Pedido da Compra Coletiva - " . $cha_dt_entrega,"",$msg_confirmacao);
 	}
 	
 
