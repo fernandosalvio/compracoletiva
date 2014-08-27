@@ -220,7 +220,7 @@
          	 	<a class="btn btn-primary" href="cestante.php?action=<?php echo(ACAO_EXIBIR_EDICAO); ?>&usr_id=<?php echo($usr_id); ?>"><i class="glyphicon glyphicon-edit glyphicon-white"></i> editar</a>
          	&nbsp;&nbsp;
 	         		<?php 
-					if($_SESSION[PAP_ADM]  || $_SESSION[PAP_RESP_NUCLEO] || $_SESSION[PAP_RESP_PEDIDO] )
+					if($_SESSION[PAP_ADM])//  || $_SESSION[PAP_RESP_NUCLEO] || $_SESSION[PAP_RESP_PEDIDO] )
 					  { 
 					 ?>
                      	  <a class="btn btn-default" href="cestantes.php"><i class="glyphicon glyphicon-list"></i> listar cestantes</a> 

@@ -1,6 +1,7 @@
 <?php  
   require  "common.inc.php"; 
-  verifica_seguranca($_SESSION[PAP_RESP_PEDIDO]);
+  //verifica_seguranca($_SESSION[PAP_RESP_PEDIDO]);
+  verifica_seguranca($_SESSION[PAP_ADM]);
   top();
 ?>
 

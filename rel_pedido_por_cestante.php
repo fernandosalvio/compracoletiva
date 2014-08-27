@@ -1,7 +1,7 @@
 <?php  
   require  "common.inc.php"; 
-  verifica_seguranca($_SESSION[PAP_RESP_PEDIDO] || $_SESSION[PAP_RESP_NUCLEO]);
-  
+  //verifica_seguranca($_SESSION[PAP_RESP_PEDIDO] || $_SESSION[PAP_RESP_NUCLEO]);
+  verifica_seguranca($_SESSION[PAP_ADM]);
   top();  
   
  $cha_id=request_get("cha_id",0);

@@ -15,7 +15,7 @@
 		  <?php  
 		  
 		   // menu de administração
-			if($_SESSION[PAP_ADM] || $_SESSION[PAP_RESP_PEDIDO] || $_SESSION[PAP_RESP_NUCLEO]  || $_SESSION[PAP_RESP_MUTIRAO] )			  
+			if($_SESSION[PAP_ADM])// || $_SESSION[PAP_RESP_PEDIDO] || $_SESSION[PAP_RESP_NUCLEO]  || $_SESSION[PAP_RESP_MUTIRAO] )			  
 			{
            ?>
             <li class="dropdown">
@@ -87,7 +87,7 @@
               
     
     		  <?php 
-			  		if($_SESSION[PAP_ADM] || $_SESSION[PAP_RESP_PEDIDO] || $_SESSION[PAP_RESP_NUCLEO] )			  
+			  		if($_SESSION[PAP_ADM]) // || $_SESSION[PAP_RESP_PEDIDO] || $_SESSION[PAP_RESP_NUCLEO] )			  
 					{
 			   ?>
 
